@@ -33,6 +33,9 @@ const userSchema = new Schema({
         bookedAt: { type: Date, default: Date.now },
         attended: { type: Boolean, default: false },  // Mark whether user attended the event
     }],
+    refreshToken: {
+        type: String,
+    },
 }, {
     timestamps: true,
 });
