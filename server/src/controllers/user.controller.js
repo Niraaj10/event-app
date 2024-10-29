@@ -4,6 +4,30 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
 
 
+
+
+const generateAccessandRefreshToken = async (userId) => {
+    try {
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        // console.log("refreshToken :", refreshToken )
+        // console.log("accessToken :", accessToken )
+
+        user.refreshToken = refreshToken
+        await user.save({ validateBeforeSave: false })
+        
+        return { accessToken, refreshToken }
+
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating access and refresh token")
+    }
+}
+
+
+
+
 const registerUser = asyncHandler( async (req, res) => {
     // res.status(201).json({
     //     message: "OKKK",
@@ -49,6 +73,61 @@ const registerUser = asyncHandler( async (req, res) => {
 
 })
 
+
+
+const loginUser = asyncHandler( async (req, res) => {
+    
+    const { email, password, username } = req.body
+
+    if ( !(email || username) ) {
+        throw new ApiError(400, "Username or email required")
+    }
+
+    const user = await User.findOne({
+        $or: [{username}, {email}]
+    })
+
+    if(!user) {
+        throw new ApiError(404, "User not found")
+    }
+    
+    const isPasswordCorrectt = await user.isPasswordCorrect(password)
+    
+    if(!isPasswordCorrectt) {
+        throw new ApiError(401, "Invalid user credentials")
+    }
+
+    const { accessToken, refreshToken } = await generateAccessandRefreshToken(user._id)
+
+    const loggedUser = await User.findById(user._id).select("-password -refreshToken")
+
+    // cookies security
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+        new ApiResponse(
+            200, 
+            {
+                user: loggedUser,
+                accessToken,
+                refreshToken
+            },
+            "User logged in successfully"
+        )
+    )
+    
+})
+
+
+
 export {
-    registerUser
+    registerUser,
+    loginUser,
 }
