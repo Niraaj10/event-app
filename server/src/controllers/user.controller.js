@@ -320,6 +320,32 @@ const uploadProfilePicture = asyncHandler( async (req, res) => {
 
 
 
+const updateUserRole = async (req, res) => {
+    const { newRole } = req.body; 
+    if (!['attendee', 'organizer'].includes(newRole)) {
+      return res.status(400).json({ message: 'Invalid role. Use "attendee" or "organizer".' });
+    }
+
+      const user = await User.findById(req.user._id);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+  
+      user.role = newRole;
+      await user.save();
+
+      return res
+      .status(200)
+      .json(
+          new ApiResponse(
+              200,
+              user,
+              'User role updated successfully'
+          )
+      )
+  };
+
+
+
+
 
 export {
     registerUser,
@@ -329,5 +355,6 @@ export {
     changeCurrentPassword,
     getCurrentUser,
     updateAccountDetails, 
-    uploadProfilePicture
+    uploadProfilePicture,
+    updateUserRole
 }
