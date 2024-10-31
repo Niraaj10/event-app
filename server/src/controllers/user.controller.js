@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { User } from '../models/user.model.js'
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
+import { uploadOnCloudi } from "../utils/cloudinary.js"
 
 
 
@@ -163,8 +164,170 @@ const logoutUser = asyncHandler( async (req, res) => {
 
 
 
+
+const refreshAccessToken  = asyncHandler( async (req, res) => {
+
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+
+    if(!incomingRefreshToken) {
+        throw new ApiError(401, "unauthorized request")
+    }
+
+    
+    try {
+        const decodedRefToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET
+        )
+        
+        const user = await User.findById(decodedRefToken?._id)
+        
+        if(!user) {
+            throw new ApiError(401, "unauthorized request")
+        }
+    
+        if ( incomingRefreshToken !== user?.refreshToken ) {
+            throw new ApiError(401, "Refresh token is expired or used") 
+        }
+    
+        const { accessToken, refreshToken } = await generateAccessandRefreshToken(user._id)
+    
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+    
+        return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                { accessToken, refreshToken },
+                "Access token refreshed"
+            )
+        )
+    } catch (error) {
+        throw new ApiError(401, error?.message || "Invalid refresh Token")
+    }
+
+})
+
+
+
+
+const changeCurrentPassword = asyncHandler( async (req, res) => {
+    const { oldPassword, newPassword } = req.body
+
+    const user = await User.findById(req.user?._id)
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+
+    if(!isPasswordCorrect) {
+        throw new ApiError(400, "Invalid old password")
+    }
+
+    user.password = newPassword
+    await user.save({ validateBeforeSave: false })
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, {}, "Password changed successfully")
+    )
+
+})
+
+
+
+
+const getCurrentUser = asyncHandler( async (req, res) => {
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, req.user, "Current user fetched successfully") 
+    )
+})
+
+
+const updateAccountDetails = asyncHandler( async (req, res) => {
+    const { fullname, email } = req.body
+
+    if(!fullname || !email) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                fullname,
+                email
+            }
+        },
+        {
+            new: true
+        }
+    ).select("-password")
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, user, "Account Details updated successfully")
+    )
+})
+
+
+
+const uploadProfilePicture = asyncHandler( async (req, res) => {
+    // console.log(req.files)
+    
+    // const profilPic = req.files
+    const profilPic = req.file?.path
+
+    if(!profilPic) {
+        throw new ApiError(400, "Profile picture file is missing")
+    }
+
+    const profile =  await uploadOnCloudi(profilPic)
+
+    if(!profile.url) {
+        throw new ApiError(400, "Error while uploading Profile picture")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set:{
+                profilePicture: profile.url
+            }
+        },
+        { new: true }
+    ).select("-password")
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            user,
+            "Profile picture updated successfully"
+        )
+    )
+
+})
+
+
+
+
+
 export {
     registerUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    refreshAccessToken,
+    changeCurrentPassword,
+    getCurrentUser,
+    updateAccountDetails, 
+    uploadProfilePicture
 }
