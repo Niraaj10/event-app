@@ -320,7 +320,7 @@ const uploadProfilePicture = asyncHandler( async (req, res) => {
 
 
 
-const updateUserRole = async (req, res) => {
+const updateUserRole = asyncHandler( async (req, res) => {
     const { newRole } = req.body; 
     if (!['attendee', 'organizer'].includes(newRole)) {
       return res.status(400).json({ message: 'Invalid role. Use "attendee" or "organizer".' });
@@ -341,9 +341,16 @@ const updateUserRole = async (req, res) => {
               'User role updated successfully'
           )
       )
-  };
+  });
 
 
+
+
+  const userEventHistory = asyncHandler( async (req, res) => {
+    //////
+
+    
+  })
 
 
 
