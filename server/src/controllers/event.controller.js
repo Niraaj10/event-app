@@ -76,7 +76,30 @@ const getEventByTitle = asyncHandler(async (req, res) => {
 
 
 
+const updateEvent = asyncHandler(async (req, res) => {
+    const { location, date, ticketPrice, totalSeats } = req.body;
 
+    const updatedEvent = await Event.findByIdAndUpdate(
+        req.params.eventId,
+        {
+            $set: {
+                location,
+                date,
+                ticketPrice,
+                totalSeats
+            }
+        },
+        {
+            new: true
+        }
+    );
+
+    if (!updatedEvent) return res.status(404).json({ message: 'Event not found' });
+
+    res.status(200).json(
+        new ApiResponse(200, updateEvent, "Event updated successfully")
+    );
+})
 
 
 const deleteEvent = asyncHandler(async (req, res) => {
