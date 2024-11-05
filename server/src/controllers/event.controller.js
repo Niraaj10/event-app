@@ -42,12 +42,45 @@ const createEvent = asyncHandler(async (req, res) => {
 
 
 
-const getEventByTitle = asyncHandler(async (req, res) => {
-    //
+const getEventById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    // Search for events with a case-insensitive title match
+    const event = await Event.findById(id)
+
+    if (!event) throw new ApiError(500, "event not find")
+
+    res.status(200).json(
+        new ApiResponse(200, event, "Event get by titles")
+    );
 })
 
 
+
+
+
+const getEventByTitle = asyncHandler(async (req, res) => {
+    const { title } = req.params;
+
+    // Search for events with a case-insensitive title match
+    const event = await Event.findOne({
+      title: { $regex: new RegExp(`^${title}$`, 'i') } // exact match, case-insensitive
+    });
+
+    if (!event) throw new ApiError(500, "event not find")
+
+    res.status(200).json(
+        new ApiResponse(200, event, "Event get by titles")
+    );
+})
+
+
+
+
+
+
 const deleteEvent = asyncHandler(async (req, res) => {
+    console.log(req.params.eventId)
     const event = await Event.findById(req.params.eventId);
     if (!event) throw new ApiError(404, "Event not found")
 
@@ -73,5 +106,8 @@ const deleteEvent = asyncHandler(async (req, res) => {
 
 export {
     createEvent,
-    deleteEvent
+    deleteEvent,
+    getEventByTitle,
+    getEventById,
+    updateEvent
 }
