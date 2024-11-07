@@ -16,17 +16,17 @@ const checkAvailableSeats = async (eventId) => {
 
 const bookEvent = asyncHandler(async (req, res) => {
     const { eventId } = req.params;
-    
+
     // Check seat availability
     const hasAvailableSeats = await checkAvailableSeats(eventId);
     if (!hasAvailableSeats) throw new ApiError(400, "Event is fully booked")
 
     // Proceed with booking
     const booking = await Bookings.create({
-      user: req.user?._id,
-      event: eventId,
-      ticketCount: ticketCount+1,
-      paymentStatus: 'pending',
+        user: req.user?._id,
+        event: eventId,
+        ticketCount: ticketCount + 1,
+        paymentStatus: 'pending',
     });
 
     if (!booking) {
@@ -34,9 +34,9 @@ const bookEvent = asyncHandler(async (req, res) => {
     }
 
     // Update event available seats
-     const updatedEventSeatCount = await Event.findByIdAndUpdate(eventId, { $inc: { availableSeats: -1 } });
+    const updatedEventSeatCount = await Event.findByIdAndUpdate(eventId, { $inc: { availableSeats: -1 } });
 
-     if (!updatedEventSeatCount) {
+    if (!updatedEventSeatCount) {
         throw new ApiError(500, "Something went wrong while Updating Event Seats Count")
     }
 
@@ -48,8 +48,37 @@ const bookEvent = asyncHandler(async (req, res) => {
 
 
 
+const cancelEventBooking = asyncHandler(async (req, res) => {
+    const { bookingId } = req.params;
+
+    if (booking.user.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, 'You are not authorized to cancel this booking');
+    }
+
+    const booking = await Bookings.findById(bookingId).populate('event');
+    if (!booking) throw new ApiError(404, "Booking not found")
+
+    const bookingDeletionResult = await booking.deleteOne();
+    if (!bookingDeletionResult) {
+        throw new ApiError(500, 'Something went wrong while deleting the booking');
+    }
+
+    const eventId = booking.event._id;
+    const updatedEventSeatCount = await Event.findByIdAndUpdate(eventId, { $inc: { availableSeats: +1 } });
+    if (!updatedEventSeatCount) {
+        throw new ApiError(500, 'Something went wrong while updating event seat count');
+    }
+
+    res.status(200).json(
+        new ApiResponse(200, booking, "Event booking canceled successfully")
+    )
+})
+
+
+
 
 
 export {
-    bookEvent
+    bookEvent,
+    cancelEventBooking
 }
