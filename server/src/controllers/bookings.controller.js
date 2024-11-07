@@ -48,6 +48,8 @@ const bookEvent = asyncHandler(async (req, res) => {
 
 
 
+
+
 const cancelEventBooking = asyncHandler(async (req, res) => {
     const { bookingId } = req.params;
 
@@ -78,7 +80,54 @@ const cancelEventBooking = asyncHandler(async (req, res) => {
 
 
 
+const getUserBookings = asyncHandler(async (req, res) => {
+    // Find bookings for the authenticated user
+    const bookings = await Bookings.aggregate([
+        {
+            $match: { user: req.user._id }
+        },
+        {
+            $lookup: {
+                from: 'events',
+                localField: 'event',
+                foreignField: '_id',
+                as: 'eventDetails'
+            }
+        },
+        {
+            $unwind: '$eventDetails'
+        },
+        {
+            $project: {
+                _id: 1,
+                event: 1,
+                ticketCount: 1,
+                qrCode: 1,
+                paymentStatus: 1,
+                checkedIn: 1,
+                'eventDetails.title': 1,
+                'eventDetails.date': 1,
+                'eventDetails.location': 1
+            }
+        }
+    ]);
+
+    if (!bookings.length) {
+        throw new ApiError(404, 'No bookings found');
+    }
+
+    res.status(200).json(
+        new ApiResponse(200, bookings, 'User bookings retrieved successfully')
+    );
+});
+
+
+
+
+
+
 export {
     bookEvent,
-    cancelEventBooking
+    cancelEventBooking,
+    getUserBookings
 }

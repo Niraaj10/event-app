@@ -15,7 +15,7 @@ app.use(express.json());
 
 import userRoutes from "./routes/user.routes.js";
 import eventRoutes from "./routes/event.route.js";
-import bookingsRoutes from "./bookings.route.js"
+import bookingsRoutes from "./routes/bookings.route.js"
 
 //routes
 app.use('/api/v1/user', userRoutes)
