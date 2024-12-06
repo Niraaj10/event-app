@@ -9,7 +9,7 @@ const Home = () => {
         {/* Home */}
 
         <div className='flex justify-center relative z-0'>
-          <img src={bg} alt="" className='w-[90vw] h-[30vh] md:h-[80vh] lg:h-[80vh] rounded-2xl object-cover z-0 static' />
+          <img src={bg} alt="" className='w-[100vw] h-[30vh] md:h-[80vh] lg:h-[80vh] md:rounded-2xl lg:rounded-2xl object-cover z-0 static' />
         </div>
 
         <div className='flex justify-center items-center'>
@@ -25,7 +25,7 @@ const Home = () => {
 
           <div className='ml-4 font-bold text-gray-700 text-2xl'>The Best of Live Events</div>
 
-          <div className='flex gap-12 flex-wrap justify-start items-center'>
+          <div className='flex gap-2 md:gap-12 lg:gap-12 flex-wrap justify-start items-center'>
             <EventCard />
             <EventCard />
             <EventCard />

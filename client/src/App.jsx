@@ -9,7 +9,7 @@ function App() {
 
   return (
     <>
-      <div className='p-2 h-[100vh] w-full'>
+      <div className='h-[100vh] w-full'>
         
         <Navbar />
 
