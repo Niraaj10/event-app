@@ -1,13 +1,16 @@
-import asyncHandler from 'express-async-handler';
-import Event from '../models/Event.js';
-import Booking from '../models/Booking.js';
-import ApiError from '../utils/ApiError.js';
-import ApiResponse from '../utils/ApiResponse.js';
+import { asyncHandler } from "../utils/asyncHandler.js"
+import { ApiResponse } from "../utils/ApiResponse.js"
+import { ApiError } from "../utils/ApiError.js"
+import { Event } from "../models/event.model.js"
+import { Bookings } from '../models/bookings.model.js'
+
+
+
 
 
 export const getRecommendations = asyncHandler(async (req, res) => {
 
-        const pastBookings = await Booking.find({ user: req.user?._id }).populate('event');
+        const pastBookings = await Bookings.find({ user: req.user?._id }).populate('event');
 
         if (!pastBookings.length) {
             throw new ApiError(404, "No past bookings found to generate recommendations");

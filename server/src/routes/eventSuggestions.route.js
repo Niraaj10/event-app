@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import { getRecommendations } from '../controllers/eventSuggestions.controller'
+import { getRecommendations } from '../controllers/eventSuggestions.controller.js'
 
 
 const router = Router()
 
-router.route('/eventSuggestion').post(getRecommendations)
+router.route('/suggestion').get(getRecommendations)
 
 
 export default router

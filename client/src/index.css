@@ -25,6 +25,14 @@
     /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
 }
 
+.text-logo {
+    background-color: #892eff;
+    background-image: url("https://www.transparenttextures.com/patterns/black-felt.png");
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
 .shadow1 {
     /* box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 8px; */
     box-shadow: rgba(0, 0, 0, 0.15) 0px -60px 300px;
