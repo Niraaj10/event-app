@@ -5,22 +5,22 @@ import EventCard from './EventCard'
 const Home = () => {
   return (
     <>
-      <div className='Home md:mx-10 lg:mx-10'>
+      <div className='Home md:mx-10 lg:mx-10 pt-6'>
         {/* Home */}
 
         <div className='group'>      
 
         <div className='relative z-0 '>
-          <div className='absolute w-full text-white flex justify-center items-center z-10 mt-20'>
-            <h1 className='text-logo logo-font text-[500px]'>Eventura</h1>
-            {/* <p className='w-60'>Ignite Your Upcoming Memorable Event Experience</p> */}
+          <div className=' absolute w-full text-white flex flex-col justify-center items-center z-10 mt-[-50px]'>
+            <h1 className='text-logo logo-font text-[300px] animate-fade-in"'>Eventura</h1>
+            <p className='text-5xl mt-[-130px] font-bold'>Ignite Your Upcoming Memorable Event Experience</p>
           </div>
           <img src={bg} alt="HomeBg" className='w-[100vw] h-[30vh] md:h-[80vh] lg:h-[80vh] md:rounded-2xl lg:rounded-2xl object-cover z-0 static' />
         </div>
 
         <div className='flex justify-center items-center'>
 
-          <div className='p-2 lg:p-9 bg-white mt-[-95px] md:mt-[-155px] lg:mt-[-155px] w-[88vw] md:w-[70vw] lg:w-[70vw] relative z-10 border rounded-xl flex gap-2 md:gap-4 lg:gap-4 justify-center  opacity-0 group-hover:opacity-100 transition-opacity duration-900'>
+          <div className='p-2 lg:p-9 bg-white mt-[-95px] md:mt-[-200px] lg:mt-[-200px] w-[88vw] md:w-[70vw] lg:w-[70vw] relative z-10 border rounded-xl flex gap-2 md:gap-4 lg:gap-4 justify-center  opacity-0 group-hover:opacity-100 transition-opacity duration-900'>
             <input type="text" placeholder='Enter your location' className='p-2 border w-[40vw] rounded-lg'/>
             <button className='bg-nav p-2 md:px-7 lg:px-7 text-white rounded-lg font-bold hover:scale-105 transition-transform duration-300 text-xs md:text-base lg:text-base'>Search Events In Your City </button>
           </div>
